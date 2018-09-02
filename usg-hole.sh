@@ -67,7 +67,6 @@ _check_file() {
     fi
 }
 
-
 # _create_file is similar to _check_file
 # but create an empty file instead
 # of a fatal
@@ -92,8 +91,8 @@ _backup() {
     _check_file "/etc/dnsmasq.d/usg-hole-blacklist-ipv6.conf"
 
     # Delete old backup
-    rm $(readlink "@last-ipv4" 2>/dev/null) 2>/dev/null && rm "@last-ipv4" 2>/dev/null || true
-    rm $(readlink "@last-ipv6" 2>/dev/null) 2>/dev/null && rm "@last-ipv6" 2>/dev/null || true
+    rm "$(readlink "@last-ipv4" 2>/dev/null)" 2>/dev/null && rm "@last-ipv4" 2>/dev/null || true
+    rm "$(readlink "@last-ipv6" 2>/dev/null)" 2>/dev/null && rm "@last-ipv6" 2>/dev/null || true
 
     # Create new backup
     local timestamp=$(date +"%Y%m%d%H%M")
@@ -148,5 +147,5 @@ _main() {
     _info "Done."
 }
 
-_main $@
+_main "$@"
 
