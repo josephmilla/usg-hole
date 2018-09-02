@@ -95,7 +95,8 @@ _backup() {
     rm "$(readlink "@last-ipv6" 2>/dev/null)" 2>/dev/null && rm "@last-ipv6" 2>/dev/null || true
 
     # Create new backup
-    local timestamp=$(date +"%Y%m%d%H%M")
+    local timestamp
+    timestamp=$(date +"%Y%m%d%H%M")
     cp -p "/etc/dnsmasq.d/usg-hole-blacklist-ipv4.conf" "$WORKSPACE/usg-hole-blacklist-ipv4-$timestamp.conf"
     cp -p "/etc/dnsmasq.d/usg-hole-blacklist-ipv6.conf" "$WORKSPACE/usg-hole-blacklist-ipv6-$timestamp.conf"
     ln -s "$WORKSPACE/usg-hole-blacklist-ipv4-$timestamp.conf" "$WORKSPACE/@last-ipv4"
@@ -131,7 +132,8 @@ _install() {
     _create_dir "$WORKSPACE"
 
     # Install
-    local current_file="$(echo $0)"
+    local current_file
+    current_file="$(echo $0)"
     _create_file "$WORKSPACE/$current_file"
     if [[ $(diff "$current_file" "$WORKSPACE/$current_file") != "" ]]; then 
         _info "Installing script in $WORKSPACE/$current_file."
