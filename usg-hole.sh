@@ -6,9 +6,6 @@ set -e
 readonly RAW_HOSTS="https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts"
 readonly WORKSPACE="/config/user-data/usg-hole"
 
-# Crontab Entry:
-# 0 3 * * * sudo /config/user-data/block-hosts.sh
-
 # _info is a helper function for logging infos
 _info() {
     echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: INFO: $*"
