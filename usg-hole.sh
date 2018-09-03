@@ -2,7 +2,7 @@
 
 set -e
 
-readonly WORKSPACE="/config/user-data/usg-hole"
+readonly WORKSPACE="/etc/usg-hole"
 declare -a BLACKLISTS=(
     "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts"
     "https://mirror1.malwaredomains.com/files/justdomains"
