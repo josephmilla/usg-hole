@@ -91,8 +91,13 @@ _backup() {
 
     # Check for files and directories
     _check_dir "$WORKSPACE" 
-    _check_file "/etc/dnsmasq.d/usg-hole-blacklist-ipv4.conf"
-    _check_file "/etc/dnsmasq.d/usg-hole-blacklist-ipv6.conf"
+
+    local ipv4_list
+    local ipv6_list
+    ipv4_list="/etc/dnsmasq.d/01-usg-hole-blacklist-ipv4.conf"
+    ipv6_list="/etc/dnsmasq.d/02-usg-hole-blacklist-ipv6.conf"
+    _check_file "$ipv4_list"
+    _check_file "$ipv6_list"
 
     # Delete old backup
     rm "$(readlink "@last-ipv4" 2>/dev/null)" 2>/dev/null && rm "@last-ipv4" 2>/dev/null || true
@@ -100,21 +105,48 @@ _backup() {
 
     # Create new backup
     local timestamp
-    timestamp=$(date +"%Y%m%d%H%M")
-    cp -p "/etc/dnsmasq.d/usg-hole-blacklist-ipv4.conf" "$WORKSPACE/usg-hole-blacklist-ipv4-$timestamp.conf"
-    cp -p "/etc/dnsmasq.d/usg-hole-blacklist-ipv6.conf" "$WORKSPACE/usg-hole-blacklist-ipv6-$timestamp.conf"
-    ln -s "$WORKSPACE/usg-hole-blacklist-ipv4-$timestamp.conf" "$WORKSPACE/@last-ipv4"
-    ln -s "$WORKSPACE/usg-hole-blacklist-ipv6-$timestamp.conf" "$WORKSPACE/@last-ipv6"
-}
+    local ipv4_backup_list
+    local ipv6_backup_list
 
+    timestamp=$(date +"%Y%m%d%H%M")
+    ipv4_backup_list="$WORKSPACE/usg-hole-blacklist-ipv4-$timestamp.conf"
+    ipv6_backup_list="$WORKSPACE/usg-hole-blacklist-ipv6-$timestamp.conf"
+
+    cp -p "$ipv4_list" "$ipv4_backup_list" 
+    cp -p "$ipv6_list" "$ipv6_backup_list" 
+    ln -s "$ipv4_backup_list" "$WORKSPACE/@last-ipv4"
+    ln -s "$ipv6_backup_list" "$WORKSPACE/@last-ipv6"
+}
 
 # _download downloads the blacklisted hosts
 # and adds them to the dnsmasq configuration
 _download() {
     _info "Downloading hosts"
-    curl -# -o /tmp/hosts $RAW_HOSTS
-    awk '$1 == "0.0.0.0" { print "address=/"$2"/0.0.0.0/" }' "/tmp/hosts" > "/etc/dnsmasq.d/usg-hole-blacklist-ipv4.conf"
-    awk '$1 == "0.0.0.0" { print "address=/"$2"/::1/" }' "/tmp/hosts" > "/etc/dnsmasq.d/usg-hole-blacklist-ipv6.conf"
+    echo > "/tmp/hosts"
+    
+    # Download hosts from sources
+    for i in "${BLACKLISTS[@]}"; do
+        curl -# "$i" > "/tmp/hosts"
+    done
+
+    # Sort and get the unique ones
+    cat "/tmp/hosts" | sort | uniq > "/tmp/hosts.tmp"
+    mv "/tmp/hosts.tmp" "/tmp/hosts"
+
+    awk '{ 
+        if ($1 == "0.0.0.0" || $1 == "127.0.0.1") 
+            print "address=/"$2"/0.0.0.0/"
+        else 
+            print "address=/"$1"/0.0.0.0/" 
+    }' "/tmp/hosts" > "/etc/dnsmasq.d/01-usg-hole-blacklist-ipv4.conf"
+
+    awk '{ 
+        if ($1 == "0.0.0.0" || $1 == "127.0.0.1") 
+            print "address=/"$2"/::1/"
+        else 
+            print "address=/"$1"/::1/" 
+    }' "/tmp/hosts" > "/etc/dnsmasq.d/01-usg-hole-blacklist-ipv6.conf"
+
     rm /tmp/hosts
 }
 
@@ -126,7 +158,7 @@ _reload() {
 
 # _uninstall removes all trails of this script
 _uninstall() {
-    rm "/etc/dnsmasq.d/usg-hole*"
+    rm "/etc/dnsmasq.d/*usg-hole*"
     rm -rf "$WORKSPACE"
 }
 
