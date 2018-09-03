@@ -126,7 +126,7 @@ _download() {
     
     # Download hosts from sources
     for i in "${BLACKLISTS[@]}"; do
-        curl -# "$i" > "/tmp/hosts"
+        curl -# "$i" >> "/tmp/hosts"
     done
 
     # Sort and get the unique ones
