@@ -145,12 +145,18 @@ _install() {
     fi
 }
 
+# _done just prints "Done
+_done() {
+    _info "Done"
+    exit 0
+}
+
 _main() {
     _install
     _download
     _reload
     _backup
-    _info "Done."
+    _done
 }
 
 _main "$@"
