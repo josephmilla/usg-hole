@@ -2,9 +2,16 @@
 
 set -e
 
-# Check out: https://github.com/StevenBlack/hosts
-readonly RAW_HOSTS="https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts"
 readonly WORKSPACE="/config/user-data/usg-hole"
+declare -a BLACKLISTS=(
+    "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts"
+    "https://mirror1.malwaredomains.com/files/justdomains"
+    "http://sysctl.org/cameleon/hosts"
+    "https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist"
+    "https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt"
+    "https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt"
+    "https://hosts-file.net/ad_servers.txt"
+)
 
 # _info is a helper function for logging infos
 _info() {
